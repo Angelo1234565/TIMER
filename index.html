@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timer MasterChef</title>
+    <title>Timer MasterChef - Orologio Analogico</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,32 +17,49 @@
             flex-direction: column;
         }
 
-        .timer-container {
-            text-align: center;
-        }
-
-        /* Orologio circolare */
-        .clock {
+        .clock-container {
+            position: relative;
             width: 300px;
             height: 300px;
             border: 15px solid #ff4c4c;
             border-radius: 50%;
-            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
+            background-color: black;
             margin-bottom: 30px;
         }
 
-        .clock .time {
-            font-size: 50px;
-            font-weight: bold;
+        .clock-face {
+            position: relative;
+            width: 100%;
+            height: 100%;
         }
 
-        /* Timer countdown */
-        #timer {
-            font-size: 30px;
-            font-weight: bold;
+        .hand {
+            position: absolute;
+            background-color: #ff4c4c;
+            top: 50%;
+            left: 50%;
+            transform-origin: 100%;
+            transform: translate(-50%, -50%);
+            transition-timing-function: steps(1);
+        }
+
+        .minute-hand {
+            width: 6px;
+            height: 100px;
+            transform-origin: 50% 100%;
+        }
+
+        .second-hand {
+            width: 2px;
+            height: 120px;
+            transform-origin: 50% 100%;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
         }
 
         input[type="number"] {
@@ -77,26 +94,31 @@
 </head>
 <body>
 
-    <div class="timer-container">
-        <div class="clock">
-            <div id="timer" class="time">00:00</div>
+    <div class="clock-container">
+        <div class="clock-face">
+            <div class="hand minute-hand" id="minuteHand"></div>
+            <div class="hand second-hand" id="secondHand"></div>
         </div>
-
-        <div>
-            <input type="number" id="minutesInput" placeholder="Minuti" min="0" max="99">
-            <input type="number" id="secondsInput" placeholder="Secondi" min="0" max="59">
-        </div>
-
-        <button id="startButton">Start</button>
-        <audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
     </div>
+
+    <div class="input-container">
+        <input type="number" id="minutesInput" placeholder="Minuti" min="0" max="99">
+        <input type="number" id="secondsInput" placeholder="Secondi" min="0" max="59">
+    </div>
+
+    <button id="startButton">Start</button>
+    <audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
 
     <script>
         let timer;
         let isRunning = false;
-        let timeLeft = 0;
+        let minutes = 0;
+        let seconds = 0;
+        let totalSeconds = 0;
+        let elapsedTime = 0;
 
-        const timerDisplay = document.getElementById('timer');
+        const minuteHand = document.getElementById('minuteHand');
+        const secondHand = document.getElementById('secondHand');
         const startButton = document.getElementById('startButton');
         const minutesInput = document.getElementById('minutesInput');
         const secondsInput = document.getElementById('secondsInput');
@@ -105,44 +127,46 @@
         startButton.addEventListener('click', () => {
             if (isRunning) {
                 clearInterval(timer);
-                music.pause(); // Stop the music if the timer is stopped
+                music.pause();
                 startButton.textContent = 'Start';
             } else {
-                const minutes = parseInt(minutesInput.value) || 0;
-                const seconds = parseInt(secondsInput.value) || 0;
-                timeLeft = minutes * 60 + seconds;
-                startTimer();
-                music.play(); // Start the music when the timer starts
+                minutes = parseInt(minutesInput.value) || 0;
+                seconds = parseInt(secondsInput.value) || 0;
+                totalSeconds = minutes * 60 + seconds;
+                elapsedTime = 0;
                 startButton.textContent = 'Stop';
+                startTimer();
+                music.play();
             }
             isRunning = !isRunning;
         });
 
         function startTimer() {
             timer = setInterval(() => {
-                if (timeLeft <= 0) {
+                if (elapsedTime >= totalSeconds) {
                     clearInterval(timer);
-                    music.pause(); // Stop the music when the time is up
+                    music.pause();
                     alert("Tempo scaduto!");
-                    timerDisplay.textContent = "00:00";
                     startButton.textContent = 'Start';
                     isRunning = false;
                 } else {
-                    timeLeft--;
-                    const minutes = Math.floor(timeLeft / 60);
-                    const seconds = timeLeft % 60;
-                    timerDisplay.textContent = formatTime(minutes, seconds);
+                    elapsedTime++;
+                    updateClockHands();
                 }
             }, 1000);
         }
 
-        function formatTime(minutes, seconds) {
-            return `${padZero(minutes)}:${padZero(seconds)}`;
+        function updateClockHands() {
+            const elapsedMinutes = Math.floor(elapsedTime / 60);
+            const elapsedSeconds = elapsedTime % 60;
+
+            const minuteDegree = (elapsedMinutes / 60) * 360;
+            const secondDegree = (elapsedSeconds / 60) * 360;
+
+            minuteHand.style.transform = `translate(-50%, -50%) rotate(${minuteDegree}deg)`;
+            secondHand.style.transform = `translate(-50%, -50%) rotate(${secondDegree}deg)`;
         }
 
-        function padZero(number) {
-            return number < 10 ? `0${number}` : number;
-        }
     </script>
 </body>
 </html>
