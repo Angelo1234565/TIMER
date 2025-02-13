@@ -6,182 +6,147 @@
     <title>Orologio Timer</title>
     <style>
         body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-            background-color: #111;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #222;
             color: white;
-            margin: 0;
-            padding: 20px;
+            font-family: Arial, sans-serif;
         }
-
-        h1 {
-            color: gold;
-            font-size: 32px;
-            text-shadow: 2px 2px 5px rgba(255, 215, 0, 0.8);
-        }
-
-        .container {
+        .clock-container {
             position: relative;
             width: 300px;
             height: 300px;
-            margin: 20px auto;
+            border: 5px solid white;
+            border-radius: 50%;
+            background-color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-
-        .clock {
+        .clock-face {
+            position: absolute;
             width: 100%;
             height: 100%;
-            background-color: #222;
-            border-radius: 50%;
-            border: 5px solid gold;
-            position: relative;
-            box-shadow: 0 0 15px gold;
         }
-
-        .number {
-            position: absolute;
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
-            transform: translate(-50%, -50%);
-        }
-
-        .minute-mark {
-            position: absolute;
-            width: 3px;
-            height: 10px;
-            background: white;
-            transform-origin: center bottom;
-        }
-
         .hand {
             position: absolute;
+            bottom: 50%;
+            left: 50%;
             width: 4px;
-            height: 45%;
-            background: red;
-            top: 5%;
-            left: 50%;
-            transform-origin: bottom center;
-            transform: rotate(0deg);
-            transition: transform 1s linear;
+            height: 40%;
+            background-color: red;
+            transform-origin: bottom;
+            transform: translateX(-50%) rotate(0deg);
+            transition: transform 0.5s linear;
         }
-
-        .center-logo {
+        .clock-number {
             position: absolute;
-            width: 50px;
-            height: 50px;
-            background: url('https://via.placeholder.com/50') no-repeat center;
-            background-size: contain;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        select, button {
-            margin: 10px;
-            padding: 10px 20px;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
-            cursor: pointer;
-            border: none;
-            border-radius: 8px;
-            transition: 0.3s;
         }
-
-        button {
-            background-color: #28a745;
-            color: white;
+        .clock-tick {
+            position: absolute;
+            width: 2px;
+            height: 10px;
+            background-color: white;
+            transform-origin: bottom;
         }
-
-        button:hover {
-            background-color: #218838;
+        .logo {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: url('logo.png') no-repeat center;
+            background-size: contain;
         }
-
+        .controls {
+            margin-top: 20px;
+        }
+        select, button {
+            font-size: 16px;
+            padding: 8px;
+            margin: 5px;
+        }
     </style>
 </head>
 <body>
 
-    <h1>⏳ Orologio Timer</h1>
-
-    <label for="durata">Seleziona la durata (minuti): </label>
-    <select id="durata">
-        <option value="5">5 min</option>
-        <option value="10">10 min</option>
-        <option value="15">15 min</option>
-        <option value="20">20 min</option>
-        <option value="30">30 min</option>
-        <option value="40">40 min</option>
-        <option value="50">50 min</option>
-        <option value="60">60 min</option>
-    </select>
-    <button onclick="startTimer()">Avvia</button>
-
-    <div class="container">
-        <div class="clock" id="clock">
-            <div class="center-logo"></div>
-            <div class="hand" id="lancetta"></div>
+    <div class="clock-container">
+        <div class="clock-face">
+            <div class="logo"></div>
+            <div class="hand" id="hand"></div>
         </div>
     </div>
 
+    <div class="controls">
+        <label for="timer-select">Seleziona i minuti:</label>
+        <select id="timer-select">
+            <option value="5">5 minuti</option>
+            <option value="10">10 minuti</option>
+            <option value="15">15 minuti</option>
+            <option value="20">20 minuti</option>
+            <option value="25">25 minuti</option>
+            <option value="30">30 minuti</option>
+            <option value="35">35 minuti</option>
+            <option value="40">40 minuti</option>
+            <option value="45">45 minuti</option>
+            <option value="50">50 minuti</option>
+            <option value="55">55 minuti</option>
+            <option value="60">60 minuti</option>
+        </select>
+        <button onclick="startTimer()">Avvia</button>
+    </div>
+
     <script>
-        function creaNumeri() {
-            const clock = document.querySelector("#clock");
-            const raggio = 120;
+        function createClock() {
+            const clockFace = document.querySelector('.clock-face');
 
             for (let i = 0; i < 12; i++) {
-                let num = i * 5;
-                let angolo = (i - 3) * 30;
-                let x = Math.cos(angolo * (Math.PI / 180)) * raggio + 150;
-                let y = Math.sin(angolo * (Math.PI / 180)) * raggio + 150;
-
-                let numberDiv = document.createElement("div");
-                numberDiv.classList.add("number");
+                const angle = (i * 30) - 90;
+                const num = (i * 5) % 60 || 0;
+                
+                const numberDiv = document.createElement("div");
+                numberDiv.classList.add("clock-number");
                 numberDiv.innerText = num;
-                numberDiv.style.left = `${x}px`;
-                numberDiv.style.top = `${y}px`;
-                clock.appendChild(numberDiv);
+                numberDiv.style.transform = `translate(-50%, -50%) rotate(${angle}deg) translate(120px) rotate(${-angle}deg)`;
+                numberDiv.style.left = "50%";
+                numberDiv.style.top = "50%";
+                clockFace.appendChild(numberDiv);
             }
 
             for (let i = 0; i < 60; i++) {
-                if (i % 5 !== 0) {
-                    let angolo = (i - 15) * 6;
-                    let x = Math.cos(angolo * (Math.PI / 180)) * (raggio - 10) + 150;
-                    let y = Math.sin(angolo * (Math.PI / 180)) * (raggio - 10) + 150;
-
-                    let mark = document.createElement("div");
-                    mark.classList.add("minute-mark");
-                    mark.style.width = i % 5 === 0 ? "3px" : "2px";
-                    mark.style.height = i % 5 === 0 ? "15px" : "10px";
-                    mark.style.left = `${x}px`;
-                    mark.style.top = `${y}px`;
-                    clock.appendChild(mark);
-                }
+                const tick = document.createElement("div");
+                tick.classList.add("clock-tick");
+                tick.style.transform = `rotate(${i * 6}deg) translateY(-130px)`;
+                tick.style.left = "50%";
+                tick.style.top = "50%";
+                tick.style.height = (i % 5 === 0) ? "15px" : "8px";
+                clockFace.appendChild(tick);
             }
         }
 
+        let countdown;
         function startTimer() {
-            let durata = parseInt(document.getElementById("durata").value);
-            let lancetta = document.getElementById("lancetta");
-            let intervallo = 1000; 
-            let angoloPerMinuto = 6; 
-            let angoloAttuale = 0;
-            let minutiRimasti = durata;
+            clearInterval(countdown);
+            let timeLeft = parseInt(document.getElementById("timer-select").value);
+            const hand = document.getElementById("hand");
 
-            lancetta.style.transform = "rotate(0deg)";
+            function updateHand() {
+                const angle = ((timeLeft / 60) * 360) - 90;
+                hand.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+            }
 
-            let timer = setInterval(() => {
-                minutiRimasti--;
-                angoloAttuale += angoloPerMinuto * (durata / 60) * 60;
-                lancetta.style.transform = `rotate(${angoloAttuale}deg)`;
-
-                if (minutiRimasti <= 0) {
-                    clearInterval(timer);
-                    alert("⏰ Tempo scaduto!");
-                }
-            }, intervallo * 60);
+            updateHand();
+            countdown = setInterval(() => {
+                timeLeft--;
+                updateHand();
+                if (timeLeft <= 0) clearInterval(countdown);
+            }, 60000);
         }
 
-        creaNumeri();
+        createClock();
     </script>
 
 </body>
