@@ -22,7 +22,7 @@
             background: white;
             border-radius: 50%;
             border: 10px solid black;
-            box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
         .numbers {
             position: absolute;
@@ -47,6 +47,9 @@
             transform: translateX(-50%) rotate(0deg);
             transition: transform 1s linear;
         }
+        .input-container {
+            margin-bottom: 20px;
+        }
         .logo {
             position: absolute;
             width: 80px;
@@ -56,18 +59,15 @@
             transform: translate(-50%, -50%);
             opacity: 0.8;
         }
-        .controls {
-            margin-top: 20px;
-            text-align: center;
-        }
-        input, button {
-            padding: 10px;
-            font-size: 18px;
-            margin: 5px;
-        }
     </style>
 </head>
 <body>
+
+    <div class="input-container">
+        <label for="minutes">Inserisci i minuti:</label>
+        <input type="number" id="minutes" min="1" max="60">
+        <button onclick="startTimer()">Avvia Timer</button>
+    </div>
 
     <div class="clock">
         <div class="numbers">
@@ -80,42 +80,41 @@
             <span style="top: 50%; left: 5%;">60</span>
         </div>
         <div class="hand" id="hand"></div>
-        <img src="your-logo.png" class="logo" alt="Logo">
-    </div>
-
-    <div class="controls">
-        <label for="minutes">Inserisci i minuti:</label>
-        <input type="number" id="minutes" min="1" max="60" value="50">
-        <button onclick="startTimer()">Avvia Timer</button>
     </div>
 
     <script>
-        let interval;
+        let countdown;
         
         function startTimer() {
-            clearInterval(interval); // Ferma eventuali timer precedenti
-
             let minutes = parseInt(document.getElementById("minutes").value);
             if (isNaN(minutes) || minutes < 1 || minutes > 60) {
-                alert("Inserisci un valore tra 1 e 60 minuti.");
+                alert("Inserisci un numero tra 1 e 60");
                 return;
             }
 
-            let remainingSeconds = minutes * 60;
-            let startDegrees = (minutes / 60) * 360; // Calcola l'angolo iniziale
+            let totalSeconds = minutes * 60;
+            let initialAngle = (minutes / 60) * 360; // Posizione iniziale della lancetta
             let hand = document.getElementById("hand");
-            
-            hand.style.transform = `translateX(-50%) rotate(${startDegrees}deg)`;
 
-            interval = setInterval(() => {
-                remainingSeconds--;
-                let angle = (remainingSeconds / (minutes * 60)) * startDegrees;
-                hand.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+            // Imposta la lancetta all'angolo iniziale
+            hand.style.transform = `translateX(-50%) rotate(${initialAngle}deg)`;
+
+            clearInterval(countdown); // Ferma eventuali timer precedenti
+            let startTime = Date.now();
+
+            countdown = setInterval(() => {
+                let elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+                let remainingSeconds = totalSeconds - elapsedSeconds;
 
                 if (remainingSeconds <= 0) {
-                    clearInterval(interval);
-                    alert("Tempo scaduto!");
+                    clearInterval(countdown);
+                    hand.style.transform = `translateX(-50%) rotate(0deg)`;
+                    return;
                 }
+
+                let angle = (remainingSeconds / totalSeconds) * initialAngle;
+                hand.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+
             }, 1000);
         }
     </script>
