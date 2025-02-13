@@ -3,95 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timer - Free Time Style</title>
+    <title>Free Time Personalizzato</title>
     <style>
         body {
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            margin-top: 20px;
+            font-size: 30px;
+            color: gold;
+        }
+
+        .container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #111;
-            color: white;
-            font-family: Arial, sans-serif;
+            margin-top: 20px;
         }
-        .clock-container {
+
+        #orologio {
             position: relative;
             width: 300px;
             height: 300px;
+            background-color: black;
+            border: 10px solid gold;
             border-radius: 50%;
-            background: radial-gradient(circle, #333, #111);
-            box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0px 0px 20px gold;
         }
-        .clock-face {
+
+        .numero {
             position: absolute;
-            width: 100%;
-            height: 100%;
-        }
-        .hand {
-            position: absolute;
-            bottom: 50%;
-            left: 50%;
-            width: 4px;
-            height: 40%;
-            background: red;
-            transform-origin: bottom;
-            transform: translateX(-50%) rotate(0deg);
-            transition: transform 1s linear;
-        }
-        .clock-number {
-            position: absolute;
-            font-size: 18px;
+            font-size: 20px;
+            color: white;
             font-weight: bold;
         }
-        .clock-tick {
+
+        .tacca {
             position: absolute;
             width: 2px;
             height: 10px;
             background-color: white;
-            transform-origin: bottom;
+            transform-origin: 50% 150px;
         }
-        .center-logo {
+
+        .lancetta {
+            position: absolute;
+            width: 4px;
+            height: 120px;
+            background-color: red;
+            top: 50%;
+            left: 50%;
+            transform-origin: 50% 100%;
+            transform: translate(-50%, -100%) rotate(0deg);
+            transition: transform 1s linear;
+        }
+
+        .logo {
             position: absolute;
             width: 60px;
             height: 60px;
-            background: url('logo.png') no-repeat center;
-            background-size: contain;
+            background-image: url('logo.png'); /* Sostituisci con il tuo logo */
+            background-size: cover;
+            border-radius: 50%;
         }
-        .controls {
-            margin-top: 20px;
-            text-align: center;
-        }
+
         select, button {
             font-size: 18px;
             padding: 10px;
-            margin: 5px;
-            border-radius: 5px;
+            margin: 10px;
             border: none;
             cursor: pointer;
+            border-radius: 5px;
         }
+
         button {
-            background: red;
-            color: white;
+            background-color: gold;
+            color: black;
             font-weight: bold;
+        }
+
+        button:hover {
+            background-color: orange;
         }
     </style>
 </head>
 <body>
 
-    <div class="clock-container">
-        <div class="clock-face">
-            <div class="center-logo"></div>
-            <div class="hand" id="hand"></div>
+    <h1>⏳ Free Time Personalizzato ⏳</h1>
+    
+    <div class="container">
+        <div id="orologio">
+            <div class="logo"></div>
+            <div class="lancetta" id="lancetta"></div>
         </div>
-    </div>
 
-    <div class="controls">
-        <label for="timer-select">Seleziona i minuti:</label>
-        <select id="timer-select">
+        <label for="tempo">Seleziona i minuti:</label>
+        <select id="tempo">
             <option value="5">5 minuti</option>
             <option value="10">10 minuti</option>
             <option value="15">15 minuti</option>
@@ -105,57 +121,70 @@
             <option value="55">55 minuti</option>
             <option value="60">60 minuti</option>
         </select>
-        <button onclick="startTimer()">Avvia</button>
+        
+        <button onclick="avviaTimer()">Avvia</button>
     </div>
 
     <script>
-        function createClock() {
-            const clockFace = document.querySelector('.clock-face');
-
-            for (let i = 0; i < 12; i++) {
-                const angle = (i * 30) - 90;
-                const num = (i * 5) % 60 || 0;
-                
-                const numberDiv = document.createElement("div");
-                numberDiv.classList.add("clock-number");
-                numberDiv.innerText = num;
-                numberDiv.style.transform = `translate(-50%, -50%) rotate(${angle}deg) translate(120px) rotate(${-angle}deg)`;
-                numberDiv.style.left = "50%";
-                numberDiv.style.top = "50%";
-                clockFace.appendChild(numberDiv);
+        function disegnaQuadrante() {
+            const orologio = document.getElementById("orologio");
+            
+            for (let i = 0; i <= 60; i += 5) {
+                const angolo = (i / 60) * 360 - 90;
+                const numero = document.createElement("div");
+                numero.className = "numero";
+                numero.innerText = i === 0 ? "0" : i;
+                const x = 140 + Math.cos(angolo * (Math.PI / 180)) * 120;
+                const y = 140 + Math.sin(angolo * (Math.PI / 180)) * 120;
+                numero.style.left = x + "px";
+                numero.style.top = y + "px";
+                orologio.appendChild(numero);
             }
 
-            for (let i = 0; i < 60; i++) {
-                const tick = document.createElement("div");
-                tick.classList.add("clock-tick");
-                tick.style.transform = `rotate(${i * 6}deg) translateY(-130px)`;
-                tick.style.left = "50%";
-                tick.style.top = "50%";
-                tick.style.height = (i % 5 === 0) ? "15px" : "5px";
-                clockFace.appendChild(tick);
+            for (let i = 1; i < 60; i++) {
+                if (i % 5 !== 0) {
+                    const angolo = (i / 60) * 360 - 90;
+                    const tacca = document.createElement("div");
+                    tacca.className = "tacca";
+                    const x = 150 + Math.cos(angolo * (Math.PI / 180)) * 110;
+                    const y = 150 + Math.sin(angolo * (Math.PI / 180)) * 110;
+                    tacca.style.left = x + "px";
+                    tacca.style.top = y + "px";
+                    tacca.style.transform = `rotate(${angolo}deg)`;
+                    orologio.appendChild(tacca);
+                }
             }
         }
 
-        let countdown;
-        function startTimer() {
-            clearInterval(countdown);
-            let timeLeft = parseInt(document.getElementById("timer-select").value);
-            const hand = document.getElementById("hand");
+        let timerAttivo = false;
+        let minutiRestanti = 0;
+        let intervallo;
 
-            function updateHand() {
-                const angle = ((timeLeft / 60) * 360) - 90;
-                hand.style.transform = `translateX(-50%) rotate(${angle}deg)`;
-            }
+        function avviaTimer() {
+            if (timerAttivo) return;
 
-            updateHand();
-            countdown = setInterval(() => {
-                timeLeft--;
-                updateHand();
-                if (timeLeft <= 0) clearInterval(countdown);
-            }, 60000);
+            const tempoSelezionato = parseInt(document.getElementById("tempo").value);
+            minutiRestanti = tempoSelezionato;
+            timerAttivo = true;
+            aggiornaLancetta();
+
+            intervallo = setInterval(() => {
+                minutiRestanti--;
+                aggiornaLancetta();
+
+                if (minutiRestanti <= 0) {
+                    clearInterval(intervallo);
+                    timerAttivo = false;
+                }
+            }, 60000); // 1 minuto
         }
 
-        createClock();
+        function aggiornaLancetta() {
+            const angolo = (minutiRestanti / 60) * 360;
+            document.getElementById("lancetta").style.transform = `translate(-50%, -100%) rotate(${angolo}deg)`;
+        }
+
+        disegnaQuadrante();
     </script>
 
 </body>
