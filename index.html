@@ -3,109 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MasterChef Timer</title>
+    <title>Orologio Timer</title>
     <style>
         body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: black;
-            color: white;
+            text-align: center;
             font-family: Arial, sans-serif;
+            background-color: #111;
+            color: white;
+            margin: 0;
+            padding: 20px;
         }
 
-        .clock-container {
+        h1 {
+            color: gold;
+            font-size: 32px;
+            text-shadow: 2px 2px 5px rgba(255, 215, 0, 0.8);
+        }
+
+        .container {
             position: relative;
             width: 300px;
             height: 300px;
+            margin: 20px auto;
         }
 
         .clock {
             width: 100%;
             height: 100%;
-            background: white;
+            background-color: #222;
             border-radius: 50%;
-            border: 10px solid black;
+            border: 5px solid gold;
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            box-shadow: 0 0 15px gold;
+        }
+
+        .number {
+            position: absolute;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            transform: translate(-50%, -50%);
+        }
+
+        .minute-mark {
+            position: absolute;
+            width: 3px;
+            height: 10px;
+            background: white;
+            transform-origin: center bottom;
         }
 
         .hand {
             position: absolute;
-            bottom: 50%;
-            left: 50%;
-            width: 5px;
+            width: 4px;
             height: 45%;
             background: red;
-            transform-origin: bottom;
-            transform: translateX(-50%) rotate(0deg);
-            transition: transform linear;
+            top: 5%;
+            left: 50%;
+            transform-origin: bottom center;
+            transform: rotate(0deg);
+            transition: transform 1s linear;
         }
 
-        .logo {
+        .center-logo {
             position: absolute;
-            width: 100px;
-            height: 100px;
+            width: 50px;
+            height: 50px;
+            background: url('https://via.placeholder.com/50') no-repeat center;
+            background-size: contain;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
-        .input-container {
-            margin-bottom: 20px;
+        select, button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            transition: 0.3s;
         }
+
+        button {
+            background-color: #28a745;
+            color: white;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="input-container">
-        <label for="minutes">Inserisci i minuti:</label>
-        <input type="number" id="minutes" min="1" max="60">
-        <button onclick="startTimer()">Avvia Timer</button>
-    </div>
+    <h1>⏳ Orologio Timer</h1>
 
-    <div class="clock-container">
-        <div class="clock">
-            <img src="logo.png" class="logo" alt="Logo">
-            <div class="hand" id="hand"></div>
+    <label for="durata">Seleziona la durata (minuti): </label>
+    <select id="durata">
+        <option value="5">5 min</option>
+        <option value="10">10 min</option>
+        <option value="15">15 min</option>
+        <option value="20">20 min</option>
+        <option value="30">30 min</option>
+        <option value="40">40 min</option>
+        <option value="50">50 min</option>
+        <option value="60">60 min</option>
+    </select>
+    <button onclick="startTimer()">Avvia</button>
+
+    <div class="container">
+        <div class="clock" id="clock">
+            <div class="center-logo"></div>
+            <div class="hand" id="lancetta"></div>
         </div>
     </div>
 
     <script>
-        let countdown;
+        function creaNumeri() {
+            const clock = document.querySelector("#clock");
+            const raggio = 120;
 
-        function startTimer() {
-            let minutes = parseInt(document.getElementById("minutes").value);
-            if (isNaN(minutes) || minutes < 1 || minutes > 60) {
-                alert("Inserisci un numero tra 1 e 60");
-                return;
+            for (let i = 0; i < 12; i++) {
+                let num = i * 5;
+                let angolo = (i - 3) * 30;
+                let x = Math.cos(angolo * (Math.PI / 180)) * raggio + 150;
+                let y = Math.sin(angolo * (Math.PI / 180)) * raggio + 150;
+
+                let numberDiv = document.createElement("div");
+                numberDiv.classList.add("number");
+                numberDiv.innerText = num;
+                numberDiv.style.left = `${x}px`;
+                numberDiv.style.top = `${y}px`;
+                clock.appendChild(numberDiv);
             }
 
-            let totalSeconds = minutes * 60;
-            let initialAngle = (minutes / 60) * 360;
-            let hand = document.getElementById("hand");
+            for (let i = 0; i < 60; i++) {
+                if (i % 5 !== 0) {
+                    let angolo = (i - 15) * 6;
+                    let x = Math.cos(angolo * (Math.PI / 180)) * (raggio - 10) + 150;
+                    let y = Math.sin(angolo * (Math.PI / 180)) * (raggio - 10) + 150;
 
-            // Imposta l'angolazione iniziale
-            hand.style.transform = `translateX(-50%) rotate(${initialAngle}deg)`;
-
-            clearInterval(countdown);
-            let startTime = Date.now();
-
-            countdown = setInterval(() => {
-                let elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
-                let remainingSeconds = totalSeconds - elapsedSeconds;
-
-                if (remainingSeconds <= 0) {
-                    clearInterval(countdown);
-                    hand.style.transform = `translateX(-50%) rotate(0deg)`;
-                    return;
+                    let mark = document.createElement("div");
+                    mark.classList.add("minute-mark");
+                    mark.style.width = i % 5 === 0 ? "3px" : "2px";
+                    mark.style.height = i % 5 === 0 ? "15px" : "10px";
+                    mark.style.left = `${x}px`;
+                    mark.style.top = `${y}px`;
+                    clock.appendChild(mark);
                 }
-
-                let angle = (remainingSeconds / totalSeconds) * initialAngle;
-                hand.style.transform = `translateX(-50%) rotate(${angle}deg)`;
-            }, 1000);
+            }
         }
+
+        function startTimer() {
+            let durata = parseInt(document.getElementById("durata").value);
+            let lancetta = document.getElementById("lancetta");
+            let intervallo = 1000; 
+            let angoloPerMinuto = 6; 
+            let angoloAttuale = 0;
+            let minutiRimasti = durata;
+
+            lancetta.style.transform = "rotate(0deg)";
+
+            let timer = setInterval(() => {
+                minutiRimasti--;
+                angoloAttuale += angoloPerMinuto * (durata / 60) * 60;
+                lancetta.style.transform = `rotate(${angoloAttuale}deg)`;
+
+                if (minutiRimasti <= 0) {
+                    clearInterval(timer);
+                    alert("⏰ Tempo scaduto!");
+                }
+            }, intervallo * 60);
+        }
+
+        creaNumeri();
     </script>
 
 </body>
