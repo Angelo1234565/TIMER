@@ -3,212 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timer MasterChef - Orologio Analogico</title>
+    <title>MasterChef Timer</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #fff;
-            color: #000;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
-            flex-direction: column;
+            background-color: black;
         }
-
-        .clock-container {
+        .clock {
             position: relative;
             width: 300px;
             height: 300px;
-            border: 15px solid #ff4c4c;
+            background: white;
             border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: white;
-            margin-bottom: 30px;
+            border: 10px solid black;
+            box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.5);
         }
-
-        .clock-face {
-            position: relative;
+        .numbers {
+            position: absolute;
             width: 100%;
             height: 100%;
-        }
-
-        .hand {
-            position: absolute;
-            background-color: #ff4c4c;
-            top: 50%;
-            left: 50%;
-            transform-origin: 100%;
-            transform: translate(-50%, -50%);
-            transition-timing-function: steps(1);
-        }
-
-        .minute-hand {
-            width: 6px;
-            height: 100px;
-            transform-origin: 50% 100%;
-        }
-
-        .second-hand {
-            width: 2px;
-            height: 120px;
-            transform-origin: 50% 100%;
-        }
-
-        .number {
-            position: absolute;
-            font-size: 18px;
+            font-family: Arial, sans-serif;
+            font-size: 20px;
             font-weight: bold;
             color: black;
         }
-
-        .number-1 { top: 10%; left: 50%; transform: translateX(-50%); }
-        .number-2 { top: 20%; left: 85%; transform: translateX(-50%); }
-        .number-3 { top: 50%; left: 90%; transform: translateY(-50%); }
-        .number-4 { top: 80%; left: 85%; transform: translateX(-50%); }
-        .number-5 { top: 90%; left: 50%; transform: translateX(-50%); }
-        .number-6 { top: 80%; left: 15%; transform: translateX(-50%); }
-        .number-7 { top: 50%; left: 10%; transform: translateY(-50%); }
-        .number-8 { top: 20%; left: 15%; transform: translateX(-50%); }
-        .number-9 { top: 10%; left: 50%; transform: translateX(-50%); }
-        .number-10 { top: 25%; left: 50%; transform: translateX(-50%); }
-        .number-11 { top: 25%; left: 70%; transform: translateX(-50%); }
-        .number-12 { top: 10%; left: 70%; transform: translateX(-50%); }
-
-        .masterchef-logo {
+        .numbers span {
             position: absolute;
-            font-size: 24px;
-            font-weight: bold;
-            color: #ff4c4c;
-            text-align: center;
-            z-index: 10;
+            transform: translate(-50%, -50%);
         }
-
-        .input-container {
-            margin-bottom: 20px;
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: 5px;
+            height: 50%;
+            background: red;
+            transform-origin: bottom;
+            transform: translateX(-50%) rotate(0deg);
+            transition: transform 0.5s linear;
         }
-
-        input[type="number"] {
-            font-size: 30px;
-            padding: 10px;
-            margin: 10px;
-            width: 100px;
-            text-align: center;
-            background-color: #333;
-            border: 1px solid #fff;
-            color: white;
-        }
-
-        button {
-            font-size: 30px;
-            padding: 10px 20px;
-            cursor: pointer;
-            background-color: #ff4c4c;
-            border: none;
-            color: white;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #ff1a1a;
-        }
-
-        audio {
-            display: none;
+        .logo {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
-
-    <div class="clock-container">
-        <div class="clock-face">
-            <div class="hand minute-hand" id="minuteHand"></div>
-            <div class="hand second-hand" id="secondHand"></div>
-            <div class="masterchef-logo">MasterMati</div>
-            <div class="number number-12">12</div>
-            <div class="number number-1">1</div>
-            <div class="number number-2">2</div>
-            <div class="number number-3">3</div>
-            <div class="number number-4">4</div>
-            <div class="number number-5">5</div>
-            <div class="number number-6">6</div>
-            <div class="number number-7">7</div>
-            <div class="number number-8">8</div>
-            <div class="number number-9">9</div>
-            <div class="number number-10">10</div>
-            <div class="number number-11">11</div>
+    <div class="clock">
+        <div class="numbers">
+            <span style="top: 5%; left: 50%;">0</span>
+            <span style="top: 20%; left: 85%;">10</span>
+            <span style="top: 50%; left: 95%;">20</span>
+            <span style="top: 80%; left: 85%;">30</span>
+            <span style="top: 95%; left: 50%;">40</span>
+            <span style="top: 80%; left: 15%;">50</span>
+            <span style="top: 50%; left: 5%;">60</span>
         </div>
+        <div class="hand" id="hand"></div>
+        <img src="your-logo.png" class="logo" alt="Logo">
     </div>
-
-    <div class="input-container">
-        <input type="number" id="minutesInput" placeholder="Minuti" min="0" max="99">
-        <input type="number" id="secondsInput" placeholder="Secondi" min="0" max="59">
-    </div>
-
-    <button id="startButton">Start</button>
-    <audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
 
     <script>
-        let timer;
-        let isRunning = false;
-        let minutes = 0;
-        let seconds = 0;
-        let totalSeconds = 0;
-        let elapsedTime = 0;
-
-        const minuteHand = document.getElementById('minuteHand');
-        const secondHand = document.getElementById('secondHand');
-        const startButton = document.getElementById('startButton');
-        const minutesInput = document.getElementById('minutesInput');
-        const secondsInput = document.getElementById('secondsInput');
-        const music = document.getElementById('music');
-
-        startButton.addEventListener('click', () => {
-            if (isRunning) {
-                clearInterval(timer);
-                music.pause();
-                startButton.textContent = 'Start';
-            } else {
-                minutes = parseInt(minutesInput.value) || 0;
-                seconds = parseInt(secondsInput.value) || 0;
-                totalSeconds = minutes * 60 + seconds;
-                elapsedTime = 0;
-                startButton.textContent = 'Stop';
-                startTimer();
-                music.play();
-            }
-            isRunning = !isRunning;
-        });
-
-        function startTimer() {
-            timer = setInterval(() => {
-                if (elapsedTime >= totalSeconds) {
-                    clearInterval(timer);
-                    music.pause();
-                    alert("Tempo scaduto!");
-                    startButton.textContent = 'Start';
-                    isRunning = false;
-                } else {
-                    elapsedTime++;
-                    updateClockHands();
-                }
-            }, 1000);
+        function updateClock() {
+            const now = new Date();
+            const seconds = now.getSeconds();
+            const degrees = (seconds / 60) * 360;
+            document.getElementById("hand").style.transform = `translateX(-50%) rotate(${degrees}deg)`;
         }
-
-        function updateClockHands() {
-            const elapsedMinutes = Math.floor(elapsedTime / 60);
-            const elapsedSeconds = elapsedTime % 60;
-
-            const minuteDegree = (elapsedMinutes / 60) * 360;
-            const secondDegree = (elapsedSeconds / 60) * 360;
-
-            minuteHand.style.transform = `translate(-50%, -50%) rotate(${minuteDegree}deg)`;
-            secondHand.style.transform = `translate(-50%, -50%) rotate(${secondDegree}deg)`;
-        }
-
+        setInterval(updateClock, 1000);
     </script>
 </body>
 </html>
